@@ -40,7 +40,7 @@ module.exports = {
         win(true);
     },
 
-    getPurchases: function (win, fail, args) {
+ /*   getPurchases: function (win, fail, args) {
         var licenses = [];
         // now get a specific licenses.
         for (var productId in this.productLicenses){
@@ -52,7 +52,7 @@ module.exports = {
         win(licenses);
     },
 
-    getAvailableProducts: function (win, fail, args) {
+     getAvailableProducts: function (win, fail, args) {
         // get the listing information for the products this app supports
         this.currentApp.loadListingInformationAsync().then(
             function (listing) {
@@ -72,7 +72,40 @@ module.exports = {
             },
             fail
         );
+    }, */
+    
+ getPurchases: function (win, fail, args) {
+        var licenses = [];
+        // now get a specific licenses.
+        for (var productId in this.currentApp.licenseInformation.productLicenses) {
+            if (this.currentApp.licenseInformation.productLicenses.hasOwnProperty(productId)) {
+                licenses.push({ license: this.currentApp.licenseInformation.productLicenses.lookup(productId) });
+            }
+        }
+        console.log("licenses", licenses);
+        win(licenses);
     },
+    
+getAvailableProducts: function (win, fail, args) {
+        // get the listing information for the products this app supports
+        this.currentApp.loadListingInformationAsync().done(
+            function (listing) {
+
+                console.log("listing", listing);
+                var productListings = listing.productListings;
+                var products = [];
+                // loadListingInformationAsync returns the ListingInformation object in listing.
+                // get the product listing collection from the ProductListings property.
+                var iterator = listing.productListings.first();
+                while (iterator.hasCurrent) {
+                    products.push(iterator.current.value);
+                    iterator.moveNext();
+                }
+                win(products);
+            },
+            fail
+        );
+    },    
 
     getProductDetails: function (win, fail, args) {
         // get the listing information for the products this app supports
